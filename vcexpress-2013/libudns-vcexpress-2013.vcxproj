@@ -75,9 +75,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <Text Include="ReadMe.txt" />
-  </ItemGroup>
-  <ItemGroup>
     <ClInclude Include="..\udns.h" />
   </ItemGroup>
   <ItemGroup>
@@ -100,6 +97,9 @@
     <ClCompile Include="..\udns_rr_srv.c" />
     <ClCompile Include="..\udns_rr_txt.c" />
     <ClCompile Include="..\udns_XtoX.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\README.md" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

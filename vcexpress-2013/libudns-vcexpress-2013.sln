@@ -6,6 +6,9 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libudns", "libudns-vcexpress-2013.vcxproj", "{3A51F52F-6E02-4F57-882F-329623DA1E26}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dnsget", "dnsget-vcexpress-2013.vcxproj", "{D25F1190-7EEC-4A10-89B5-586EBC01A552}"
+	ProjectSection(ProjectDependencies) = postProject
+		{3A51F52F-6E02-4F57-882F-329623DA1E26} = {3A51F52F-6E02-4F57-882F-329623DA1E26}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
