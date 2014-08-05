@@ -40,14 +40,20 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
-  <PropertyGroup />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <IncludePath>../include;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <IncludePath>../include;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
-      <PrecompiledHeader>
-      </PrecompiledHeader>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32_LEAN_AND_MEAN;WINDOWS;WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;WIN32_LEAN_AND_MEAN;WINDOWS;WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PrecompiledHeaderFile />
+      <PrecompiledHeaderOutputFile />
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -60,12 +66,13 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
-      <PrecompiledHeader>
-      </PrecompiledHeader>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32_LEAN_AND_MEAN;WINDOWS;WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;WIN32_LEAN_AND_MEAN;WINDOWS;WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PrecompiledHeaderFile />
+      <PrecompiledHeaderOutputFile />
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -78,31 +85,30 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="..\udns.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="..\getopt.c" />
-    <ClCompile Include="..\inet_XtoX.c" />
-    <ClCompile Include="..\rblcheck.c" />
-    <ClCompile Include="..\udns_bl.c" />
-    <ClCompile Include="..\udns_codes.c" />
-    <ClCompile Include="..\udns_dn.c" />
-    <ClCompile Include="..\udns_dntosp.c" />
-    <ClCompile Include="..\udns_init.c" />
-    <ClCompile Include="..\udns_jran.c" />
-    <ClCompile Include="..\udns_misc.c" />
-    <ClCompile Include="..\udns_parse.c" />
-    <ClCompile Include="..\udns_resolver.c" />
-    <ClCompile Include="..\udns_rr_a.c" />
-    <ClCompile Include="..\udns_rr_mx.c" />
-    <ClCompile Include="..\udns_rr_naptr.c" />
-    <ClCompile Include="..\udns_rr_ptr.c" />
-    <ClCompile Include="..\udns_rr_srv.c" />
-    <ClCompile Include="..\udns_rr_txt.c" />
-    <ClCompile Include="..\udns_XtoX.c" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="..\README.md" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\include\udns.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\src\getopt.c" />
+    <ClCompile Include="..\src\inet_XtoX.c" />
+    <ClCompile Include="..\src\udns_bl.c" />
+    <ClCompile Include="..\src\udns_codes.c" />
+    <ClCompile Include="..\src\udns_dn.c" />
+    <ClCompile Include="..\src\udns_dntosp.c" />
+    <ClCompile Include="..\src\udns_init.c" />
+    <ClCompile Include="..\src\udns_jran.c" />
+    <ClCompile Include="..\src\udns_misc.c" />
+    <ClCompile Include="..\src\udns_parse.c" />
+    <ClCompile Include="..\src\udns_resolver.c" />
+    <ClCompile Include="..\src\udns_rr_a.c" />
+    <ClCompile Include="..\src\udns_rr_mx.c" />
+    <ClCompile Include="..\src\udns_rr_naptr.c" />
+    <ClCompile Include="..\src\udns_rr_ptr.c" />
+    <ClCompile Include="..\src\udns_rr_srv.c" />
+    <ClCompile Include="..\src\udns_rr_txt.c" />
+    <ClCompile Include="..\src\udns_XtoX.c" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
