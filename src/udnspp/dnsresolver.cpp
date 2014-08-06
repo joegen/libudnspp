@@ -18,6 +18,7 @@
 //
 
 
+#include <cstdlib>
 #include <udnspp/dnsresolver.hpp>
 
 namespace udnspp {
