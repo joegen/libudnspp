@@ -20,6 +20,7 @@
 #include <cstdlib>
 #include <cassert>
 #include <udnspp/dnscontext.hpp>
+#include <iostream>
 
 
 namespace udnspp {
@@ -36,11 +37,11 @@ dns_ctx* DefaultContext::gDefCtx = 0;
 
 DefaultContext::DefaultContext()
 {
-  if (!gDefCtx)
+  if (!DefaultContext::gDefCtx)
   {
     _canFreeCtx = false;
-    _pCtx = gDefCtx = &dns_defctx;
-    dns_init(_pCtx, 0);
+    dns_init(0, 0);
+    _pCtx = DefaultContext::gDefCtx = &dns_defctx;
   }
 }
 
@@ -49,8 +50,7 @@ static DefaultContext* gDefaultContext = 0;
 
 DNSContext::DNSContext()
 {
-  assert(DefaultContext::gDefCtx);
-  _pCtx = dns_new(DefaultContext::gDefCtx);
+  _pCtx = 0;
   _canFreeCtx = true;
   _socketFd = -1;
 }
@@ -77,6 +77,13 @@ DNSContext* DNSContext::defaultContext()
 
 dns_ctx* DNSContext::context()
 {
+  if (!_pCtx)
+  {
+    assert(DefaultContext::gDefCtx);
+    _pCtx = dns_new(DefaultContext::gDefCtx);
+    if (_pCtx)
+      open();
+  }
   return _pCtx;
 }
 
