@@ -61,7 +61,7 @@ int main(int argc, char** argv)
 
   std::ostringstream srvudp;
   srvudp << "_sip._udp." << qname;
-  udnspp::DNSSRVRecord srv_rr = resolver.resolveSrv(srvudp.str(), 0);
+  udnspp::DNSSRVRecord srv_rr = resolver.resolveSRV(srvudp.str(), 0);
 
   if (!srv_rr.getRecords().empty())
   {

@@ -25,6 +25,10 @@
 #include <udnspp/dnscontext.h>
 #include <udnspp/dnsarecord.h>
 #include <udnspp/dnssrvrecord.h>
+#include <udnspp/dnsnaptrrecord.h>
+#include <udnspp/dnsptrrecord.h>
+#include <udnspp/dnsmxrecord.h>
+#include <udnspp/dnstxtrecord.h>
 
 
 namespace udnspp {
@@ -41,14 +45,18 @@ public:
 
   DNSARecord resolveA6(const std::string& name, int flags) const;
 
-  DNSSRVRecord resolveSrv(const std::string& name, int flags) const;
+  DNSSRVRecord resolveSRV(const std::string& name, int flags) const;
 
-protected:
-  dns_rr_a4* resolve_a4(const std::string& name, int flags) const;
+  DNSNAPTRRecord resolveNAPTR(const std::string& name, int flags) const;
 
-  dns_rr_a6* resolve_a6(const std::string& name, int flags) const;
+  DNSPTRRecord resolvePTR4(const std::string& ip4address) const;
 
-  dns_rr_srv* resolve_srv(const std::string& name, int flags) const;
+  DNSPTRRecord resolvePTR6(const std::string& ip6address) const;
+
+  DNSMXRecord resolveMX(const std::string& name, int flags) const;
+
+  DNSTXTRecord resolveTXT(const std::string& name, int qcls, int flags) const;
+
 private:
   DNSContext* _pContext;
   bool _canDeleteContext;
@@ -57,16 +65,6 @@ private:
 //
 // Inlines
 //
-
-inline dns_rr_a4* DNSResolver::resolve_a4(const std::string& name, int flags) const
-{
-  return dns_resolve_a4(_pContext->context(), name.c_str(), flags);
-}
-
-inline dns_rr_a6* DNSResolver::resolve_a6(const std::string& name, int flags) const
-{
-  return dns_resolve_a6(_pContext->context(), name.c_str(), flags);
-}
 
 
 } // namespace udnspp

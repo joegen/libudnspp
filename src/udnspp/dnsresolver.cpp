@@ -23,6 +23,15 @@
 #include <iostream>
 #include <udnspp/dnsresolver.h>
 
+#ifdef WINDOWS
+#include <windows.h>
+#include <winsock2.h>
+#include <Ws2tcpip.h>
+#else
+#include <arpa/inet.h>
+#endif
+
+
 namespace udnspp {
 
 
@@ -38,10 +47,9 @@ DNSResolver::DNSResolver(DNSContext* pContext)
   _pContext = pContext;
 }
 
-
 DNSARecord DNSResolver::resolveA4(const std::string& name, int flags) const
 {
-  dns_rr_a4* pRr = resolve_a4(name, flags);
+  dns_rr_a4* pRr = dns_resolve_a4(_pContext->context(), name.c_str(), flags);
   if (pRr)
   {
     DNSARecordV4 rr(pRr);
@@ -53,7 +61,7 @@ DNSARecord DNSResolver::resolveA4(const std::string& name, int flags) const
 
 DNSARecord DNSResolver::resolveA6(const std::string& name, int flags) const
 {
-  dns_rr_a6* pRr = resolve_a6(name, flags);
+  dns_rr_a6* pRr = dns_resolve_a6(_pContext->context(), name.c_str(), flags);
   if (pRr)
   {
     DNSARecordV6 rr(pRr);
@@ -63,13 +71,78 @@ DNSARecord DNSResolver::resolveA6(const std::string& name, int flags) const
   return DNSARecord();
 }
 
-dns_rr_srv* DNSResolver::resolve_srv(const std::string& qname, int flags) const
+DNSPTRRecord DNSResolver::resolvePTR4(const std::string& address) const
+{
+  in_addr ip4;
+  dns_pton(AF_INET, address.c_str(), &ip4);
+  dns_rr_ptr* pRr = dns_resolve_a4ptr(_pContext->context(), &ip4);
+  if (pRr)
+  {
+    DNSPTRRecord rr(pRr);
+    free(pRr);
+    return rr;
+  }
+  return DNSPTRRecord();
+}
+
+DNSPTRRecord DNSResolver::resolvePTR6(const std::string& address) const
+{
+  in6_addr ip6;
+  dns_pton(AF_INET6, address.c_str(), &ip6);
+  dns_rr_ptr* pRr = dns_resolve_a6ptr(_pContext->context(), &ip6);
+  if (pRr)
+  {
+    DNSPTRRecord rr(pRr);
+    free(pRr);
+    return rr;
+  }
+  return DNSPTRRecord();
+}
+
+DNSMXRecord DNSResolver::resolveMX(const std::string& name, int flags) const
+{
+  dns_rr_mx* pRr = dns_resolve_mx(_pContext->context(), name.c_str(), flags);
+  if (pRr)
+  {
+    DNSMXRecord rr(pRr);
+    free(pRr);
+    return rr;
+  }
+  return DNSMXRecord();
+}
+
+DNSNAPTRRecord DNSResolver::resolveNAPTR(const std::string& name, int flags) const
+{
+  dns_rr_naptr* pRr = dns_resolve_naptr(_pContext->context(), name.c_str(), flags);
+  if (pRr)
+  {
+    DNSNAPTRRecord rr(pRr);
+    free(pRr);
+    return rr;
+  }
+  return DNSNAPTRRecord();
+}
+
+DNSTXTRecord DNSResolver::resolveTXT(const std::string& name, int qcls, int flags) const
+{
+  dns_rr_txt* pRr = dns_resolve_txt(_pContext->context(), name.c_str(), qcls, flags);
+  if (pRr)
+  {
+    DNSTXTRecord rr(pRr);
+    free(pRr);
+    return rr;
+  }
+  return DNSTXTRecord();
+}
+
+
+DNSSRVRecord DNSResolver::resolveSRV(const std::string& name, int flags) const
 {
   std::string srv;
   std::string proto;
 
   char* tok = 0;
-  tok = std::strtok((char*)qname.c_str(), ".");
+  tok = std::strtok((char*)name.c_str(), ".");
   if (!tok)
     return 0;
   srv = tok;
@@ -79,22 +152,19 @@ dns_rr_srv* DNSResolver::resolve_srv(const std::string& qname, int flags) const
     return 0;
   proto = tok;
 
-  return dns_resolve_srv(_pContext->context(), 
-    qname.c_str() + srv.length() + proto.length() + 2, // domain less the srv and proto string plus two dots
+  dns_rr_srv* pRr = dns_resolve_srv(_pContext->context(),
+    name.c_str() + srv.length() + proto.length() + 2, // domain less the srv and proto string plus two dots
     srv.c_str() + 1, // srv less the underscore
     proto.c_str() + 1,  // proto less the underscore
     flags);
-}
 
-DNSSRVRecord DNSResolver::resolveSrv(const std::string& name, int flags) const
-{
-  dns_rr_srv* pRr = resolve_srv(name, flags);
   if (pRr)
   {
     DNSSRVRecord rr(pRr);
     free(pRr);
     return rr;
   }
+
   return DNSSRVRecord();
 }
 
