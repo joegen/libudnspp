@@ -23,18 +23,6 @@ static void die(int errnum, const char *fmt, ...) {
 
 int main(int argc, char** argv)
 {
-  //
-  // Initialize the default context
-  //
-
-#ifdef WINDOWS
-  WSADATA wsaData;
-  if (WSAStartup(MAKEWORD(1, 1), &wsaData) != 0)
-  {
-    die(0, "WSAStartup() failed miserably! With error code %ld\n", WSAGetLastError());
-  }
-#endif
-
   std::string qname = "bridge.ossapp.com";
   if (argc >= 2)
     qname = argv[1];

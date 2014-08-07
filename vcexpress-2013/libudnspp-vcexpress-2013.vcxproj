@@ -86,6 +86,7 @@
   <ItemGroup>
     <ClInclude Include="..\include\udnspp.h" />
     <ClInclude Include="..\include\udnspp\dnscontext.h" />
+    <ClInclude Include="..\include\udnspp\dnsmxrecord.h" />
     <ClInclude Include="..\include\udnspp\dnsnaptrrecord.h" />
     <ClInclude Include="..\include\udnspp\dnsptrrecord.h" />
     <ClInclude Include="..\include\udnspp\dnsquery.h" />
@@ -93,9 +94,11 @@
     <ClInclude Include="..\include\udnspp\dnsarecord.h" />
     <ClInclude Include="..\include\udnspp\dnsrrcommon.h" />
     <ClInclude Include="..\include\udnspp\dnssrvrecord.h" />
+    <ClInclude Include="..\include\udnspp\dnstxtrecord.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\udnspp\dnscontext.cpp" />
+    <ClCompile Include="..\src\udnspp\dnsmxrecord.cpp" />
     <ClCompile Include="..\src\udnspp\dnsnaptrrecord.cpp" />
     <ClCompile Include="..\src\udnspp\dnsptrrecord.cpp" />
     <ClCompile Include="..\src\udnspp\dnsquery.cpp" />
@@ -105,6 +108,7 @@
       </ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="..\src\udnspp\dnssrvrecord.cpp" />
+    <ClCompile Include="..\src\udnspp\dnstxtrecord.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -22,6 +22,10 @@
 #include <udnspp/dnscontext.h>
 #include <iostream>
 
+#ifdef WINDOWS
+#include <windows.h>
+#include <winsock2.h>
+#endif
 
 namespace udnspp {
 
@@ -39,6 +43,18 @@ DefaultContext::DefaultContext()
 {
   if (!DefaultContext::gDefCtx)
   {
+#if WINDOWS
+    SOCKET s = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+    if (s == INVALID_SOCKET && WSAGetLastError() == WSANOTINITIALISED)
+    {
+      WSADATA wsaData;
+      if (WSAStartup(MAKEWORD(1, 1), &wsaData) != 0)
+      {
+        std::cerr << "Winsock initialization error!!!" << std::endl;
+        std::abort();
+      }
+    }
+#endif
     _canFreeCtx = false;
     dns_init(0, 0);
     _pCtx = DefaultContext::gDefCtx = &dns_defctx;
