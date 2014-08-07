@@ -88,13 +88,15 @@
     <ClInclude Include="..\include\udnspp\dnscontext.hpp" />
     <ClInclude Include="..\include\udnspp\dnsquery.hpp" />
     <ClInclude Include="..\include\udnspp\dnsresolver.hpp" />
-    <ClInclude Include="..\include\udnspp\dnsrra4.hpp" />
+    <ClInclude Include="..\include\udnspp\dnsarecord.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\udnspp\dnscontext.cpp" />
     <ClCompile Include="..\src\udnspp\dnsquery.cpp" />
     <ClCompile Include="..\src\udnspp\dnsresolver.cpp" />
-    <ClCompile Include="..\src\udnspp\dnsrra4.cpp" />
+    <ClCompile Include="..\src\udnspp\dnsrra4.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -46,16 +46,16 @@ dns_rr_a6* DNSResolver::resolve_a6(const std::string& name, int flags)
   return dns_resolve_a6(_pContext->context(), name.c_str(), flags);
 }
 
-DNSRRA4 DNSResolver::resolveA4(const std::string& name, int flags)
+DNSARecordV4 DNSResolver::resolveA4(const std::string& name, int flags)
 {
   dns_rr_a4* pRr = resolve_a4(name, flags);
   if (pRr)
   {
-    DNSRRA4 rr(pRr);
+    DNSARecordV4 rr(pRr);
     free(pRr);
     return rr;
   }
-  return DNSRRA4();
+  return DNSARecordV4();
 }
 
 

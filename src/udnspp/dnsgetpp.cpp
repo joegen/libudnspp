@@ -34,14 +34,27 @@ int main(int argc, char** argv)
   }
 #endif
 
+  std::string qname = "bridge.ossapp.com";
+  if (argc >= 2)
+    qname = argv[1];
+
   udnspp::DNSContext::defaultContext()->open();
   udnspp::DNSResolver resolver;
 
-  udnspp::DNSRRA4 rr = resolver.resolveA4(argv[1], 0);
+  udnspp::DNSARecord rr = resolver.resolveA4(qname, 0);
 
-  std::cout << "QName: " << rr.getRR().begin()->_qname << std::endl;
-  std::cout << "Address: " << rr.getRR().begin()->_address << std::endl;
-  std::cout << "CName: " << rr.getRR().begin()->_cname << std::endl;
-  std::cout << "TTL: " << rr.getRR().begin()->_ttl << std::endl;
-  
+  if (!rr.getAddressList().empty())
+  {
+    std::cout << "QName: " << rr.getQName() << std::endl;
+    std::cout << "CName: " << rr.getCName() << std::endl;
+    std::cout << "Address: " << rr.getAddressList().front() << std::endl;
+    std::cout << "TTL: " << rr.getTTL() << std::endl;
+  }
+  else
+  {
+    std::cout << qname << " did not yield any result." << std::endl;
+    exit(-1);
+  }
+
+  exit(0);
 }

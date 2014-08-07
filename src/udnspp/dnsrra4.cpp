@@ -18,7 +18,8 @@
 //
 
 
-#include <udnspp/dnsrra4.hpp>
+#include <cassert>
+#include <udnspp/dnsarecord.hpp>
 
 
 #ifdef WINDOWS
@@ -38,7 +39,10 @@ DNSRRA4::DNSRRA4()
 
 DNSRRA4::DNSRRA4(const DNSRRA4& rr)
 {
-  _rr = rr._rr;
+  _address = rr._address;
+  _cname = rr._cname;
+  _qname = rr._qname;
+  _ttl = rr._ttl;
 }
 
 DNSRRA4::DNSRRA4(dns_rr_a4* pRr)
@@ -50,9 +54,12 @@ DNSRRA4::~DNSRRA4()
 {
 }
 
-void DNSRRA4::swap(DNSRRA4& copy)
+void DNSRRA4::swap(DNSRRA4& rr)
 {
-  std::swap(_rr, copy._rr);
+  std::swap(_address, rr._address);
+  std::swap(_cname, rr._cname);
+  std::swap(_qname, rr._qname);
+  std::swap(_ttl, rr._ttl);
 }
 
 DNSRRA4& DNSRRA4::operator=(const DNSRRA4& rr)
@@ -70,14 +77,14 @@ DNSRRA4& DNSRRA4::operator=(dns_rr_a4* pRr)
 
 void DNSRRA4::parseRR(dns_rr_a4* pRr)
 {
+  assert(pRr);
+  _cname = pRr->dnsa4_cname;
+  _qname = pRr->dnsa4_qname;
+  _ttl = pRr->dnsa4_ttl;
+
   for (int i = 0; i < pRr->dnsa4_nrr; i++) 
-  {
-    A4 a4;
-    a4._address = inet_ntoa(pRr->dnsa4_addr[i]);
-    a4._cname = pRr->dnsa4_cname;
-    a4._qname = pRr->dnsa4_qname;
-    a4._ttl = pRr->dnsa4_ttl;
-    _rr.push_back(a4);
+  {    
+    _address.push_back(inet_ntoa(pRr->dnsa4_addr[i]));
   }
 }
 

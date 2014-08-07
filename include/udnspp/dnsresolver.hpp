@@ -23,7 +23,7 @@
 
 #include <udnspp/dnsquery.hpp>
 #include <udnspp/dnscontext.hpp>
-#include <udnspp/dnsrra4.hpp>
+#include <udnspp/dnsarecord.hpp>
 
 
 namespace udnspp {
@@ -36,7 +36,7 @@ public:
 
   DNSResolver(DNSContext* pContext);
 
-  DNSRRA4 resolveA4(const std::string& name, int flags);
+  DNSARecordV4 resolveA4(const std::string& name, int flags);
 protected:
   dns_rr_a4* resolve_a4(const std::string& name, int flags);
 
