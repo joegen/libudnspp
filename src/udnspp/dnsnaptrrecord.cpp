@@ -18,73 +18,48 @@
 //
 
 
-#include <cassert>
-#include <udnspp/dnsarecord.hpp>
-
-
-#ifdef WINDOWS
-#include <windows.h>
-#include <winsock2.h>
-#else
-#include <arpa/inet.h>
-#endif
+#include <udnspp/dnsnaptrrecord.h>
 
 
 namespace udnspp {
 
-
-DNSRRA4::DNSRRA4()
+  
+DNSNAPTRRecord::DNSNAPTRRecord()
 {
 }
 
-DNSRRA4::DNSRRA4(const DNSRRA4& rr)
+DNSNAPTRRecord::DNSNAPTRRecord(const DNSNAPTRRecord& rr) :
+  DNSRRCommon(rr)
 {
-  _address = rr._address;
-  _cname = rr._cname;
-  _qname = rr._qname;
-  _ttl = rr._ttl;
 }
 
-DNSRRA4::DNSRRA4(dns_rr_a4* pRr)
+DNSNAPTRRecord::DNSNAPTRRecord(dns_rr_naptr* pRr)
 {
   parseRR(pRr);
 }
 
-DNSRRA4::~DNSRRA4()
+DNSNAPTRRecord::~DNSNAPTRRecord()
 {
 }
 
-void DNSRRA4::swap(DNSRRA4& rr)
-{
-  std::swap(_address, rr._address);
-  std::swap(_cname, rr._cname);
-  std::swap(_qname, rr._qname);
-  std::swap(_ttl, rr._ttl);
-}
-
-DNSRRA4& DNSRRA4::operator=(const DNSRRA4& rr)
-{
-  DNSRRA4 clonable(rr);
-  swap(clonable);
-  return *this;
-}
-
-DNSRRA4& DNSRRA4::operator=(dns_rr_a4* pRr)
-{
-  parseRR(pRr);
-  return *this;
-}
-
-void DNSRRA4::parseRR(dns_rr_a4* pRr)
+void DNSNAPTRRecord::parseRR(dns_rr_naptr* pRr)
 {
   assert(pRr);
-  _cname = pRr->dnsa4_cname;
-  _qname = pRr->dnsa4_qname;
-  _ttl = pRr->dnsa4_ttl;
+  _cname = pRr->dnsnaptr_cname;
+  _qname = pRr->dnsnaptr_qname;
+  _ttl = pRr->dnsnaptr_ttl;
 
-  for (int i = 0; i < pRr->dnsa4_nrr; i++) 
-  {    
-    _address.push_back(inet_ntoa(pRr->dnsa4_addr[i]));
+  _records.clear();
+  for (int i = 0; i < pRr->dnsnaptr_nrr; i++)
+  {
+    NAPTRRecord rec;
+    rec.order = pRr->dnsnaptr_naptr[i].order;
+    rec.preference = pRr->dnsnaptr_naptr[i].preference;
+    rec.flags = pRr->dnsnaptr_naptr[i].flags;
+    rec.service = pRr->dnsnaptr_naptr[i].service;
+    rec.regexp = pRr->dnsnaptr_naptr[i].regexp;
+    rec.replacement = pRr->dnsnaptr_naptr[i].replacement;
+    _records.push_back(rec);
   }
 }
 

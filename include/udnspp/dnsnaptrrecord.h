@@ -17,57 +17,44 @@
 // DEALINGS IN THE SOFTWARE.
 //
 
-#include <cstdlib>
-#include <udnspp/dnsquery.h>
+#ifndef UDNSPP_DNSNAPTRRECORD_INCLUDED
+#define UDNSPP_DNSNAPTRRECORD_INCLUDED
+
+
+#include <udnspp/dnsrrcommon.h>
 
 
 namespace udnspp {
 
+  struct NAPTRRecord
+  {
+    int order;		            // NAPTR order 
+    int preference;	          // NAPTR preference
+    std::string flags;		    // NAPTR flags
+    std::string service;	    // NAPTR service
+    std::string regexp;		    // NAPTR regexp
+    std::string replacement;	// NAPTR replacement
+  };
 
-DNSQuery::DNSQuery() :
-  _type(DNS_T_INVALID),
-  _dn(0)
-{
-}
+  typedef std::vector<NAPTRRecord> DNSNAPTRRecordList;
 
-DNSQuery::DNSQuery(dns_type type, const std::string& name) :
-  _type(DNS_T_INVALID),
-  _dn(0)
-{
-  create(type, name);
-}
+  class DNSNAPTRRecord : public DNSRRCommon<DNSNAPTRRecordList>
+  {
+  public:
 
-DNSQuery::DNSQuery(const DNSQuery& query) :
-  _type(DNS_T_INVALID),
-  _dn(0)
-{
-  create(query._type, query._name);
-}
+    DNSNAPTRRecord();
 
-DNSQuery::~DNSQuery()
-{
-  ::free(_dn);
-}
+    DNSNAPTRRecord(const DNSNAPTRRecord& rr);
 
-void DNSQuery::create(dns_type type, const std::string& name)
-{
-  _type = type;
-  _name = name;
-  _dn = (unsigned char*)::malloc(dns_dnlen(_dn));
-}
+    DNSNAPTRRecord(dns_rr_naptr* pRr);
 
-void DNSQuery::swap(DNSQuery& copy)
-{
-  std::swap(_type, copy._type);
-  std::swap(_dn, copy._dn);
-  std::swap(_name, copy._name);
-}
+    ~DNSNAPTRRecord();
 
-DNSQuery& DNSQuery::operator=(const DNSQuery& query)
-{
-  DNSQuery clonable(query);
-  swap(clonable);
-  return *this;
-}
+    void parseRR(dns_rr_naptr* pRr);
 
-}
+  };
+
+
+} // namespace udns
+
+#endif // UDNSPP_DNSNAPTRRECORD_INCLUDED

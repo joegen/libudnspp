@@ -17,57 +17,56 @@
 // DEALINGS IN THE SOFTWARE.
 //
 
-#include <cstdlib>
-#include <udnspp/dnsquery.h>
+
+#include <udnspp/dnssrvrecord.h>
+
+#ifdef WINDOWS
+#include <windows.h>
+#include <winsock2.h>
+#include <Ws2tcpip.h>
+#else
+#include <arpa/inet.h>
+#endif
 
 
 namespace udnspp {
 
 
-DNSQuery::DNSQuery() :
-  _type(DNS_T_INVALID),
-  _dn(0)
+DNSSRVRecord::DNSSRVRecord()
 {
 }
 
-DNSQuery::DNSQuery(dns_type type, const std::string& name) :
-  _type(DNS_T_INVALID),
-  _dn(0)
+DNSSRVRecord::DNSSRVRecord(const DNSSRVRecord& rr) :
+  DNSRRCommon(rr)
 {
-  create(type, name);
 }
 
-DNSQuery::DNSQuery(const DNSQuery& query) :
-  _type(DNS_T_INVALID),
-  _dn(0)
+DNSSRVRecord::DNSSRVRecord(dns_rr_srv* pRr)
 {
-  create(query._type, query._name);
+  parseRR(pRr);
 }
 
-DNSQuery::~DNSQuery()
+DNSSRVRecord::~DNSSRVRecord()
 {
-  ::free(_dn);
 }
 
-void DNSQuery::create(dns_type type, const std::string& name)
+void DNSSRVRecord::parseRR(dns_rr_srv* pRr)
 {
-  _type = type;
-  _name = name;
-  _dn = (unsigned char*)::malloc(dns_dnlen(_dn));
+  assert(pRr);
+  _cname = pRr->dnssrv_cname;
+  _qname = pRr->dnssrv_qname;
+  _ttl = pRr->dnssrv_ttl;
+
+  _records.clear();
+  for (int i = 0; i < pRr->dnssrv_nrr; i++)
+  {
+    SRVRecord rec;
+    rec.name = pRr->dnssrv_srv[i].name;
+    rec.port = pRr->dnssrv_srv[i].port;
+    rec.priority = pRr->dnssrv_srv[i].priority;
+    rec.weight = pRr->dnssrv_srv[i].weight;
+    _records.push_back(rec);
+  }
 }
 
-void DNSQuery::swap(DNSQuery& copy)
-{
-  std::swap(_type, copy._type);
-  std::swap(_dn, copy._dn);
-  std::swap(_name, copy._name);
-}
-
-DNSQuery& DNSQuery::operator=(const DNSQuery& query)
-{
-  DNSQuery clonable(query);
-  swap(clonable);
-  return *this;
-}
-
-}
+} // namespace udns

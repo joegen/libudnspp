@@ -19,7 +19,9 @@
 
 
 #include <cstdlib>
-#include <udnspp/dnsresolver.hpp>
+#include <cstring>
+#include <iostream>
+#include <udnspp/dnsresolver.h>
 
 namespace udnspp {
 
@@ -36,17 +38,8 @@ DNSResolver::DNSResolver(DNSContext* pContext)
   _pContext = pContext;
 }
 
-dns_rr_a4* DNSResolver::resolve_a4(const std::string& name, int flags)
-{
-  return dns_resolve_a4(_pContext->context(), name.c_str(), flags);
-}
 
-dns_rr_a6* DNSResolver::resolve_a6(const std::string& name, int flags)
-{
-  return dns_resolve_a6(_pContext->context(), name.c_str(), flags);
-}
-
-DNSARecordV4 DNSResolver::resolveA4(const std::string& name, int flags)
+DNSARecord DNSResolver::resolveA4(const std::string& name, int flags) const
 {
   dns_rr_a4* pRr = resolve_a4(name, flags);
   if (pRr)
@@ -55,7 +48,54 @@ DNSARecordV4 DNSResolver::resolveA4(const std::string& name, int flags)
     free(pRr);
     return rr;
   }
-  return DNSARecordV4();
+  return DNSARecord();
+}
+
+DNSARecord DNSResolver::resolveA6(const std::string& name, int flags) const
+{
+  dns_rr_a6* pRr = resolve_a6(name, flags);
+  if (pRr)
+  {
+    DNSARecordV6 rr(pRr);
+    free(pRr);
+    return rr;
+  }
+  return DNSARecord();
+}
+
+dns_rr_srv* DNSResolver::resolve_srv(const std::string& qname, int flags) const
+{
+  std::string srv;
+  std::string proto;
+
+  char* tok = 0;
+  tok = std::strtok((char*)qname.c_str(), ".");
+  if (!tok)
+    return 0;
+  srv = tok;
+
+  tok = std::strtok(0, ".");
+  if (!tok)
+    return 0;
+  proto = tok;
+
+  return dns_resolve_srv(_pContext->context(), 
+    qname.c_str() + srv.length() + proto.length() + 2, // domain less the srv and proto string plus two dots
+    srv.c_str() + 1, // srv less the underscore
+    proto.c_str() + 1,  // proto less the underscore
+    flags);
+}
+
+DNSSRVRecord DNSResolver::resolveSrv(const std::string& name, int flags) const
+{
+  dns_rr_srv* pRr = resolve_srv(name, flags);
+  if (pRr)
+  {
+    DNSSRVRecord rr(pRr);
+    free(pRr);
+    return rr;
+  }
+  return DNSSRVRecord();
 }
 
 

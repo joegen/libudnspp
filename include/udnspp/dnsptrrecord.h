@@ -17,57 +17,36 @@
 // DEALINGS IN THE SOFTWARE.
 //
 
-#include <cstdlib>
-#include <udnspp/dnsquery.h>
+#ifndef UDNSPP_DNSPTRRECORD_INCLUDED
+#define UDNSPP_DNSPTRRECORD_INCLUDED
+
+
+#include <udnspp/dnsrrcommon.h>
+
 
 
 namespace udnspp {
 
 
-DNSQuery::DNSQuery() :
-  _type(DNS_T_INVALID),
-  _dn(0)
-{
-}
+  typedef std::vector<std::string> DNSPTRRecordList;
 
-DNSQuery::DNSQuery(dns_type type, const std::string& name) :
-  _type(DNS_T_INVALID),
-  _dn(0)
-{
-  create(type, name);
-}
+  class DNSPTRRecord : public DNSRRCommon<DNSPTRRecordList>
+  {
+  public:
 
-DNSQuery::DNSQuery(const DNSQuery& query) :
-  _type(DNS_T_INVALID),
-  _dn(0)
-{
-  create(query._type, query._name);
-}
+    DNSPTRRecord();
 
-DNSQuery::~DNSQuery()
-{
-  ::free(_dn);
-}
+    DNSPTRRecord(const DNSPTRRecord& rr);
 
-void DNSQuery::create(dns_type type, const std::string& name)
-{
-  _type = type;
-  _name = name;
-  _dn = (unsigned char*)::malloc(dns_dnlen(_dn));
-}
+    DNSPTRRecord(dns_rr_ptr* pRr);
 
-void DNSQuery::swap(DNSQuery& copy)
-{
-  std::swap(_type, copy._type);
-  std::swap(_dn, copy._dn);
-  std::swap(_name, copy._name);
-}
+    ~DNSPTRRecord();
 
-DNSQuery& DNSQuery::operator=(const DNSQuery& query)
-{
-  DNSQuery clonable(query);
-  swap(clonable);
-  return *this;
-}
+    void parseRR(dns_rr_ptr* pRr);
 
-}
+  };
+
+
+} // namespace udns
+
+#endif // UDNSPP_DNSPTRRECORD_INCLUDED

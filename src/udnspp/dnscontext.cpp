@@ -19,7 +19,7 @@
 
 #include <cstdlib>
 #include <cassert>
-#include <udnspp/dnscontext.hpp>
+#include <udnspp/dnscontext.h>
 #include <iostream>
 
 

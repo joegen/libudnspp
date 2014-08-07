@@ -17,57 +17,43 @@
 // DEALINGS IN THE SOFTWARE.
 //
 
-#include <cstdlib>
-#include <udnspp/dnsquery.h>
+#ifndef UDNSPP_DNSSRVRECORD_INCLUDED
+#define UDNSPP_DNSSRVRECORD_INCLUDED
+
+
+#include <udnspp/dnsrrcommon.h>
+
 
 
 namespace udnspp {
 
-
-DNSQuery::DNSQuery() :
-  _type(DNS_T_INVALID),
-  _dn(0)
+struct SRVRecord
 {
-}
+  int priority;		  // SRV priority
+  int weight;		    // SRV weight
+  int port;		      // SRV port
+  std::string name;	// SRV name
+};
 
-DNSQuery::DNSQuery(dns_type type, const std::string& name) :
-  _type(DNS_T_INVALID),
-  _dn(0)
+typedef std::vector<SRVRecord> DNSSRVRecordList;
+
+class DNSSRVRecord : public DNSRRCommon<DNSSRVRecordList>
 {
-  create(type, name);
-}
+public:
 
-DNSQuery::DNSQuery(const DNSQuery& query) :
-  _type(DNS_T_INVALID),
-  _dn(0)
-{
-  create(query._type, query._name);
-}
+  DNSSRVRecord();
 
-DNSQuery::~DNSQuery()
-{
-  ::free(_dn);
-}
+  DNSSRVRecord(const DNSSRVRecord& rr);
 
-void DNSQuery::create(dns_type type, const std::string& name)
-{
-  _type = type;
-  _name = name;
-  _dn = (unsigned char*)::malloc(dns_dnlen(_dn));
-}
+  DNSSRVRecord(dns_rr_srv* pRr);
 
-void DNSQuery::swap(DNSQuery& copy)
-{
-  std::swap(_type, copy._type);
-  std::swap(_dn, copy._dn);
-  std::swap(_name, copy._name);
-}
+  ~DNSSRVRecord();
 
-DNSQuery& DNSQuery::operator=(const DNSQuery& query)
-{
-  DNSQuery clonable(query);
-  swap(clonable);
-  return *this;
-}
+  void parseRR(dns_rr_srv* pRr);
 
-}
+};
+
+
+} // namespace udns
+
+#endif // UDNSPP_DNSSRVRECORD_INCLUDED
