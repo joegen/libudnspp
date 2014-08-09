@@ -46,6 +46,8 @@ public:
 
   dns_ctx* context();
 
+  dns_ctx* context(bool autoOpen);
+
   static DNSContext* defaultContext();
 protected:
   dns_ctx* _pCtx;
@@ -80,6 +82,11 @@ inline bool DNSContext::setOption(dns_opt option, int value)
 inline bool DNSContext::setFlags(int flags)
 {
   return setOption(DNS_OPT_FLAGS, flags);
+}
+
+inline dns_ctx* DNSContext::context()
+{
+  return context(true);
 }
 
 

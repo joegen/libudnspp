@@ -20,6 +20,7 @@
 
 #include <cstdlib>
 #include <cstring>
+#include <ctime>
 #include <iostream>
 #include <udnspp/dnsresolver.h>
 
@@ -37,14 +38,32 @@ namespace udnspp {
 
 DNSResolver::DNSResolver()
 {
+#ifdef  ENABLE_ASYNC_RESOLVE
+  _stopProcessingEvents = false;
+  _pThread = 0;
+#endif
   _canDeleteContext = true;
   _pContext = new DNSContext();
 }
 
 DNSResolver::DNSResolver(DNSContext* pContext)
 {
+#ifdef  ENABLE_ASYNC_RESOLVE
+  _stopProcessingEvents = false;
+  _pThread = 0;
+#endif
   _canDeleteContext = false;
   _pContext = pContext;
+}
+
+DNSResolver::~DNSResolver()
+{
+#ifdef  ENABLE_ASYNC_RESOLVE
+  stop();
+#endif
+  if (_canDeleteContext)
+    delete _pContext;
+    
 }
 
 DNSARecord DNSResolver::resolveA4(const std::string& name, int flags) const
@@ -169,4 +188,264 @@ DNSSRVRecord DNSResolver::resolveSRV(const std::string& name, int flags) const
 }
 
 
+#ifdef ENABLE_ASYNC_RESOLVE
+
+struct ResolveA4CB
+{
+  void* user_data;
+  DNSARecordV4CB cb;
+};
+
+struct ResolveA6CB
+{
+  void* user_data;
+  DNSARecordV6CB cb;
+};
+
+struct ResolveMXCB
+{
+  void* user_data;
+  DNSMXRecordCB cb;
+};
+
+struct ResolveTXTCB
+{
+  void* user_data;
+  DNSTXTRecordCB cb;
+};
+
+struct ResolvePTRCB
+{
+  void* user_data;
+  DNSPTRRecordCB cb;
+};
+
+struct ResolveNAPTRCB
+{
+  void* user_data;
+  DNSNAPTRRecordCB cb;
+};
+
+struct ResolveSRVCB
+{
+  void* user_data;
+  DNSSRVRecordCB cb;
+};
+
+static void dns_query_a4_cb(struct dns_ctx* ctx, struct dns_rr_a4* result, void* userData)
+{
+  ResolveA4CB* pCb = static_cast<ResolveA4CB*>(userData);
+  if (pCb)
+  {
+    DNSARecordV4 rr(result);
+    pCb->cb(rr, pCb->user_data);
+    delete pCb;
+  }
 }
+
+void DNSResolver::resolveA4(const std::string& name, int flags, DNSARecordV4CB cb, void* userData) const
+{
+  ResolveA4CB* pCB = new ResolveA4CB();
+  pCB->cb = cb;
+  pCB->user_data = userData;
+  dns_submit_a4(_pContext->context(), name.c_str(), flags, dns_query_a4_cb, (void*)pCB);
+}
+
+static void dns_query_a6_cb(struct dns_ctx* ctx, struct dns_rr_a6* result, void* userData)
+{
+  ResolveA6CB* pCb = static_cast<ResolveA6CB*>(userData);
+  if (pCb)
+  {
+    DNSARecordV6 rr(result);
+    pCb->cb(rr, pCb->user_data);
+    delete pCb;
+  }
+}
+
+void DNSResolver::resolveA6(const std::string& name, int flags, DNSARecordV6CB cb, void* userData) const
+{
+  ResolveA6CB* pCB = new ResolveA6CB();
+  pCB->cb = cb;
+  pCB->user_data = userData;
+  dns_submit_a6(_pContext->context(), name.c_str(), flags, dns_query_a6_cb, (void*)pCB);
+}
+
+static void dns_query_srv_cb(dns_ctx* pCtx, dns_rr_srv* pResult, void* pUserData)
+{
+  ResolveSRVCB* pCb = static_cast<ResolveSRVCB*>(pUserData);
+  if (pCb)
+  {
+    DNSSRVRecord rr(pResult);
+    pCb->cb(rr, pCb->user_data);
+    delete pCb;
+  }
+}
+
+void DNSResolver::resolveSRV(const std::string& name, int flags, DNSSRVRecordCB cb, void* userData) const
+{
+  std::string srv;
+  std::string proto;
+
+  char* tok = 0;
+  tok = std::strtok((char*)name.c_str(), ".");
+  if (!tok)
+  {
+    return;
+  }
+  srv = tok;
+
+  tok = std::strtok(0, ".");
+  if (!tok)
+  {
+    return;
+  }
+  proto = tok;
+
+  ResolveSRVCB* pCB = new ResolveSRVCB();
+  pCB->cb = cb;
+  pCB->user_data = userData;
+
+  dns_submit_srv(_pContext->context(),
+    name.c_str() + srv.length() + proto.length() + 2, // domain less the srv and proto string plus two dots
+    srv.c_str() + 1, // srv less the underscore
+    proto.c_str() + 1,  // proto less the underscore
+    flags,
+    dns_query_srv_cb,
+    (void*)pCB);
+}
+
+static void dns_query_naptr_cb(dns_ctx* pCtx, dns_rr_naptr* pResult, void* pUserData)
+{
+  ResolveNAPTRCB* pCb = static_cast<ResolveNAPTRCB*>(pUserData);
+  if (pCb)
+  {
+    DNSNAPTRRecord rr(pResult);
+    pCb->cb(rr, pCb->user_data);
+    delete pCb;
+  }
+}
+
+void DNSResolver::resolveNAPTR(const std::string& name, int flags, DNSNAPTRRecordCB cb, void* userData) const
+{
+  ResolveNAPTRCB* pCB = new ResolveNAPTRCB();
+  pCB->cb = cb;
+  pCB->user_data = userData;
+  dns_submit_naptr(_pContext->context(), name.c_str(), flags, dns_query_naptr_cb, (void*)pCB);
+}
+
+static void dns_query_ptr_cb(dns_ctx* pCtx, dns_rr_ptr* pResult, void* pUserData)
+{
+  ResolvePTRCB* pCb = static_cast<ResolvePTRCB*>(pUserData);
+  if (pCb)
+  {
+    DNSPTRRecord rr(pResult);
+    pCb->cb(rr, pCb->user_data);
+    delete pCb;
+  }
+}
+
+void DNSResolver::resolvePTR4(const std::string& ip4address, DNSPTRRecordCB cb, void* userData) const
+{
+  ResolvePTRCB* pCB = new ResolvePTRCB();
+  pCB->cb = cb;
+  pCB->user_data = userData;
+  in_addr ip4;
+  dns_pton(AF_INET, ip4address.c_str(), &ip4);
+  dns_submit_a4ptr(_pContext->context(), &ip4, dns_query_ptr_cb, (void*)pCB);
+}
+
+void DNSResolver::resolvePTR6(const std::string& ip6address, DNSPTRRecordCB cb, void* userData) const
+{
+  ResolvePTRCB* pCB = new ResolvePTRCB();
+  pCB->cb = cb;
+  pCB->user_data = userData;
+  in6_addr ip6;
+  dns_pton(AF_INET6, ip6address.c_str(), &ip6);
+  dns_submit_a6ptr(_pContext->context(), &ip6, dns_query_ptr_cb, (void*)pCB);
+}
+
+static void dns_query_mx_cb(dns_ctx* pCtx, dns_rr_mx* pResult, void* pUserData)
+{
+  ResolveMXCB* pCb = static_cast<ResolveMXCB*>(pUserData);
+  if (pCb)
+  {
+    DNSMXRecord rr(pResult);
+    pCb->cb(rr, pCb->user_data);
+    delete pCb;
+  }
+}
+
+void DNSResolver::resolveMX(const std::string& name, int flags, DNSMXRecordCB cb, void* userData) const
+{
+  ResolveMXCB* pCB = new ResolveMXCB();
+  pCB->cb = cb;
+  pCB->user_data = userData;
+  dns_submit_mx(_pContext->context(), name.c_str(), flags, dns_query_mx_cb, (void*)pCB);
+}
+
+static void dns_query_txt_cb(dns_ctx* pCtx, dns_rr_txt* pResult, void* pUserData)
+{
+  ResolveTXTCB* pCb = static_cast<ResolveTXTCB*>(pUserData);
+  if (pCb)
+  {
+    DNSTXTRecord rr(pResult);
+    pCb->cb(rr, pCb->user_data);
+    delete pCb;
+  }
+}
+
+void DNSResolver::resolveTXT(const std::string& name, int qcls, int flags, DNSTXTRecordCB cb, void* userData) const
+{
+  ResolveTXTCB* pCB = new ResolveTXTCB();
+  pCB->cb = cb;
+  pCB->user_data = userData;
+  dns_submit_txt(_pContext->context(), name.c_str(), qcls, flags, dns_query_txt_cb, (void*)pCB);
+}
+
+void DNSResolver::start()
+{
+  if (!_pThread)
+    _pThread = new boost::thread(boost::bind(&DNSResolver::startProcessingEvents, this));
+}
+
+void DNSResolver::startProcessingEvents()
+{
+  while (!_stopProcessingEvents)
+    processEvents();
+}
+
+void DNSResolver::stop()
+{
+  _stopProcessingEvents = true;
+  if (_pThread)
+  {
+    _pThread->join();
+    delete _pThread;
+    _pThread = 0;
+  }
+}
+
+void DNSResolver::processEvents()
+{
+  fd_set fds;
+  timeval tv;
+  time_t now = 0;
+  int nextTimeout = 0;
+
+  FD_ZERO(&fds);
+  while (!_stopProcessingEvents && (nextTimeout = dns_timeouts(0, -1, now)) > 0)
+  {
+    FD_SET(_pContext->getSocketFd(), &fds);
+    tv.tv_sec = nextTimeout;
+    tv.tv_usec = 0;
+    now = time(0);
+    if (select(_pContext->getSocketFd() + 1, &fds, 0, 0, &tv) > 0)
+      dns_ioevent(0, now);
+  }
+}
+
+
+
+#endif // ENABLE_ASYNC_RESOLVE
+
+} // namespace udnspp

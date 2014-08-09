@@ -91,15 +91,21 @@ DNSContext* DNSContext::defaultContext()
   return gDefaultContext;
 }
 
-dns_ctx* DNSContext::context()
+dns_ctx* DNSContext::context(bool autoOpen)
 {
   if (!_pCtx)
   {
-    assert(DefaultContext::gDefCtx);
+    if (!DefaultContext::gDefCtx)
+    {
+      DNSContext::defaultContext()->open();
+      assert(DefaultContext::gDefCtx);
+    }
     _pCtx = dns_new(DefaultContext::gDefCtx);
-    if (_pCtx)
-      open();
   }
+
+  if (_pCtx && autoOpen  && !isOpen())
+    open();
+
   return _pCtx;
 }
 
