@@ -37,7 +37,7 @@ DNSSRVRecord::DNSSRVRecord()
 }
 
 DNSSRVRecord::DNSSRVRecord(const DNSSRVRecord& rr) :
-  DNSRRCommon(rr)
+  DNSRRCommon<DNSSRVRecordList>(rr)
 {
 }
 

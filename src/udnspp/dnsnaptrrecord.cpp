@@ -29,7 +29,7 @@ DNSNAPTRRecord::DNSNAPTRRecord()
 }
 
 DNSNAPTRRecord::DNSNAPTRRecord(const DNSNAPTRRecord& rr) :
-  DNSRRCommon(rr)
+  DNSRRCommon<DNSNAPTRRecordList>(rr)
 {
 }
 

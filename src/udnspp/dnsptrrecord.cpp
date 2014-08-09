@@ -29,7 +29,7 @@ DNSPTRRecord::DNSPTRRecord()
 }
 
 DNSPTRRecord::DNSPTRRecord(const DNSPTRRecord& rr) :
-  DNSRRCommon(rr)
+  DNSRRCommon<DNSPTRRecordList>(rr)
 {
 }
 

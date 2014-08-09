@@ -37,7 +37,7 @@ DNSMXRecord::DNSMXRecord()
 }
 
 DNSMXRecord::DNSMXRecord(const DNSMXRecord& rr) :
-  DNSRRCommon(rr)
+  DNSRRCommon<DNSMXRecordList>(rr)
 {
 }
 

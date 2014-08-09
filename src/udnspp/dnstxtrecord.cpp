@@ -37,7 +37,7 @@ namespace udnspp {
   }
 
   DNSTXTRecord::DNSTXTRecord(const DNSTXTRecord& rr) :
-    DNSRRCommon(rr)
+    DNSRRCommon<DNSTXTRecordList>(rr)
   {
   }
 
