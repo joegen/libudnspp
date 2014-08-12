@@ -42,10 +42,14 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <IncludePath>../include;../../boost;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
     <TargetExt>.lib</TargetExt>
+    <OutDir>$(SolutionDir)$(Configuration)-$(ProjectName)\</OutDir>
+    <IntDir>$(Configuration)-$(ProjectName)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <IncludePath>../include;../../boost;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
     <TargetExt>.lib</TargetExt>
+    <OutDir>$(SolutionDir)$(Configuration)-$(ProjectName)\</OutDir>
+    <IntDir>$(Configuration)-$(ProjectName)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -95,6 +99,7 @@
     <ClInclude Include="..\include\udnspp\dnsrrcommon.h" />
     <ClInclude Include="..\include\udnspp\dnssrvrecord.h" />
     <ClInclude Include="..\include\udnspp\dnstxtrecord.h" />
+    <ClInclude Include="..\include\udnspp\dnscache.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\udnspp\dnscontext.cpp" />

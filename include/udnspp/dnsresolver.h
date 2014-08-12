@@ -29,6 +29,7 @@
 #include <udnspp/dnsptrrecord.h>
 #include <udnspp/dnsmxrecord.h>
 #include <udnspp/dnstxtrecord.h>
+#include <udnspp/dnscache.h>
 
 
 #ifdef HAVE_BOOSTLIBS
@@ -52,9 +53,25 @@ typedef boost::function<void(const DNSMXRecord&, void*)> DNSMXRecordCB;
 
 #endif
 
+#ifdef ENABLE_LRU_CACHE
+typedef DNSCache<DNSARecordV4> DNSARecordV4Cache;
+typedef DNSCache<DNSARecordV6> DNSARecordV6Cache;
+typedef DNSCache<DNSSRVRecord> DNSSRVRecordCache;
+typedef DNSCache<DNSPTRRecord> DNSPTRRecordCache;
+typedef DNSCache<DNSTXTRecord> DNSTXTRecordCache;
+typedef DNSCache<DNSNAPTRRecord> DNSNAPTRRecordCache;
+typedef DNSCache<DNSMXRecord> DNSMXRecordCache;
+#endif
+
+
 class DNSResolver
 {
 public:
+#ifdef ENABLE_ASYNC_RESOLVE
+  typedef boost::mutex mutex;
+  typedef boost::lock_guard<mutex> mutex_lock;
+#endif
+
   DNSResolver();
 
   DNSResolver(DNSContext* pContext);
@@ -99,20 +116,30 @@ public:
 
   void stop();
 
+  void processEvents();
+
 private:
   bool _stopProcessingEvents;
-
   boost::thread* _pThread;
+  mutable mutex _eventMutex;
 
-  void startProcessingEvents();
-
-  void processEvents();
 
 #endif  // ENABLE_ASYNC_RESOLVE
 
 private:
   DNSContext* _pContext;
   bool _canDeleteContext;
+
+#ifdef ENABLE_LRU_CACHE
+  mutable DNSARecordV4Cache _v4Cache;
+  mutable DNSARecordV6Cache _v6Cache;
+  mutable DNSSRVRecordCache _srvCache;
+  mutable DNSPTRRecordCache _ptrCache;
+  mutable DNSTXTRecordCache _txtCache;
+  mutable DNSNAPTRRecordCache _naPtrCache;
+  mutable DNSMXRecordCache _mxCache;
+#endif
+
 };
 
 //

@@ -27,6 +27,10 @@
 #include <cassert>
 
 
+#ifdef WINDOWS
+#include <Windows.h>
+#endif
+
 namespace udnspp {
 
 template <typename T>

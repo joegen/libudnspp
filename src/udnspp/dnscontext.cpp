@@ -20,6 +20,7 @@
 #include <cstdlib>
 #include <cassert>
 #include <udnspp/dnscontext.h>
+#include <udnspp/dnscache.h>
 #include <iostream>
 
 #ifdef WINDOWS
