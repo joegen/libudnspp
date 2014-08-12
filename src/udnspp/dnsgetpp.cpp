@@ -1,4 +1,4 @@
-#include <udnspp/dnsresolver.h>
+
 #include <iostream>
 #include <cstdio>
 #include <sstream>
@@ -12,6 +12,8 @@
 #else
 #include <arpa/inet.h>
 #endif
+
+#include <udnspp/dnsresolver.h>
 
 #define PROGNAME "dnsgetpp"
 static bool exit_thread = false;
@@ -78,7 +80,11 @@ void thread_loop1(udnspp::DNSResolver* resolver, std::string qname)
 {
   while (!exit_thread)
   {
+#ifdef WINDOWS
     ::Sleep(10);
+#else
+    usleep(10000);
+#endif
     resolver->resolveA4(qname, 0, boost::bind(handle_dns_av4, _1, _2), (void *)&qname);
   }
 
@@ -89,7 +95,11 @@ void thread_loop2(udnspp::DNSResolver* resolver, std::string qname)
 {
   while (!exit_thread)
   {
+#ifdef WINDOWS
     ::Sleep(10);
+#else
+    usleep(10000);
+#endif
     udnspp::DNSARecord rr = resolver->resolveA4(qname, 0);
     if (!rr.getRecords().empty())
     {

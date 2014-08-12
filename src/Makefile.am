@@ -2,9 +2,11 @@ SUBDIRS = .
 AM_CPPFLAGS = \
 	-Wall \
 	-DHAVE_BOOSTLIBS \
+	-DHAVE_INET_PTON_NTOP \
 	-I$(top_srcdir)/include
 	
 AM_CFLAGS = \
+	-DHAVE_INET_PTON_NTOP \
 	-I$(top_srcdir)/include
 
 lib_LTLIBRARIES = libudnspp.la
@@ -25,7 +27,7 @@ libudnspp_la_SOURCES = \
 	udns_resolver.c  \
 	udns_rr_mx.c     \
 	udns_rr_ptr.c  \
-	udns_rr_txt.c
+	udns_rr_txt.c \
 	udns_codes.c  \
 	udns_dntosp.c  \
 	udns_jran.c  \
@@ -46,7 +48,6 @@ libudnspp_la_SOURCES = \
 bin_PROGRAMS = dnsgetpp
 
 dnsgetpp_CXXFLAGS = \
-	${common_cxx_flags} \
 	-fno-gcse -O0 -fno-implement-inlines -fno-default-inline
 
 dnsgetpp_LDADD = \

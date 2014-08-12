@@ -75,7 +75,6 @@ namespace udnspp {
       std::string qname;
       T rec;
     };
-
     typedef boost::multi_index_container<
       entry,
       boost::multi_index::indexed_by<
@@ -96,7 +95,7 @@ namespace udnspp {
       mutex_lock lock(_mutex);
       while (_cache.size() > _maxSize)
       {
-        _cache.get<1>().erase(_cache.get<1>().begin());
+        _cache.template get<1>().erase(_cache.template get<1>().begin());
       }
     }
 
@@ -116,8 +115,12 @@ namespace udnspp {
     bool find(const std::string& key, T& record)
     {
       mutex_lock lock(_mutex);
-      LRUCache::nth_index<0>::type::iterator iter = _cache.get<0>().find(key);
-      if (iter == _cache.get<0>().end())
+      
+      typedef typename LRUCache::template nth_index<0>::type rr_set;
+
+      typename rr_set::iterator iter = _cache.template get<0>().find(key);
+
+      if (iter == _cache.template get<0>().end())
         return false;
       DNSCacheExpireTime lruTime = iter->lruTime;
       DNSCacheExpireTime expireTime = (iter->rec.getTTL() * 1000) + lruTime;
@@ -125,7 +128,7 @@ namespace udnspp {
 
       if (now > expireTime)
       {
-        _cache.get<0>().erase(iter);
+        _cache.template get<0>().erase(iter);
         return false;
       }
 
