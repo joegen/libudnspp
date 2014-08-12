@@ -21,7 +21,6 @@
 #define UDNSPP_DNSRESOLVER_INCLUDED
 
 
-#include <udnspp/dnsquery.h>
 #include <udnspp/dnscontext.h>
 #include <udnspp/dnsarecord.h>
 #include <udnspp/dnssrvrecord.h>

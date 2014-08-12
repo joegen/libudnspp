@@ -93,7 +93,6 @@
     <ClInclude Include="..\include\udnspp\dnsmxrecord.h" />
     <ClInclude Include="..\include\udnspp\dnsnaptrrecord.h" />
     <ClInclude Include="..\include\udnspp\dnsptrrecord.h" />
-    <ClInclude Include="..\include\udnspp\dnsquery.h" />
     <ClInclude Include="..\include\udnspp\dnsresolver.h" />
     <ClInclude Include="..\include\udnspp\dnsarecord.h" />
     <ClInclude Include="..\include\udnspp\dnsrrcommon.h" />
@@ -106,7 +105,6 @@
     <ClCompile Include="..\src\udnspp\dnsmxrecord.cpp" />
     <ClCompile Include="..\src\udnspp\dnsnaptrrecord.cpp" />
     <ClCompile Include="..\src\udnspp\dnsptrrecord.cpp" />
-    <ClCompile Include="..\src\udnspp\dnsquery.cpp" />
     <ClCompile Include="..\src\udnspp\dnsresolver.cpp" />
     <ClCompile Include="..\src\udnspp\dnsarecord.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
