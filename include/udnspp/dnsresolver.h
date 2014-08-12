@@ -131,6 +131,20 @@ private:
   bool _canDeleteContext;
 
 #ifdef ENABLE_LRU_CACHE
+public:
+  void enableLRUCache(bool enabled);
+  bool isLRUCacheEnabled() const;
+
+  DNSARecordV4Cache& v4Cache();
+  DNSARecordV6Cache& v6Cache();
+  DNSSRVRecordCache& srvCache();
+  DNSPTRRecordCache& ptrCache();
+  DNSTXTRecordCache& txtCache();
+  DNSNAPTRRecordCache& naPtrCache();
+  DNSMXRecordCache& mxCache();
+
+private:
+  bool _enableLRUCache;
   mutable DNSARecordV4Cache _v4Cache;
   mutable DNSARecordV6Cache _v6Cache;
   mutable DNSSRVRecordCache _srvCache;
@@ -146,8 +160,56 @@ private:
 // Inlines
 //
 
+#ifdef ENABLE_LRU_CACHE
+inline  void DNSResolver::enableLRUCache(bool enabled)
+{
+  _enableLRUCache = enabled;
+}
+
+inline bool DNSResolver::isLRUCacheEnabled() const
+{
+  return _enableLRUCache;
+}
+
+inline DNSARecordV4Cache& DNSResolver::v4Cache()
+{
+  return _v4Cache;
+}
+
+inline DNSARecordV6Cache& DNSResolver::v6Cache()
+{
+  return _v6Cache;
+}
+
+inline DNSSRVRecordCache& DNSResolver::srvCache()
+{
+  return _srvCache;
+}
+
+inline DNSPTRRecordCache& DNSResolver::ptrCache()
+{
+  return _ptrCache;
+}
+
+inline DNSTXTRecordCache& DNSResolver::txtCache()
+{
+  return _txtCache;
+}
+
+inline DNSNAPTRRecordCache& DNSResolver::naPtrCache()
+{
+  return _naPtrCache;
+}
+
+inline DNSMXRecordCache& DNSResolver::mxCache()
+{
+  return _mxCache;
+}
+
+#endif
+
 
 } // namespace udnspp
 
 
-#endif
+#endif  // UDNSPP_DNSRESOLVER_INCLUDED
