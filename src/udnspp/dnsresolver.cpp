@@ -55,7 +55,7 @@ DNSResolver::DNSResolver() :
   _pThread = 0;
 #endif
   _canDeleteContext = true;
-  _pContext = new DNSContext();
+  _pContext = new DNSContext(*DNSContext::defaultContext());
 }
 
 DNSResolver::DNSResolver(DNSContext* pContext) :
