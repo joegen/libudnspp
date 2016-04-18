@@ -21,9 +21,12 @@
 
  */
 
+#if 0
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
+#endif
+
 #ifdef WINDOWS
 # include <winsock2.h>          /* includes <windows.h> */
 # include <iphlpapi.h>		/* for dns server addresses etc */
