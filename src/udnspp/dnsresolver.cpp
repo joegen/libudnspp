@@ -35,7 +35,7 @@
 
 namespace udnspp {
 
-static const std::size_t MAX_CACHE_SIZE = 100;
+#define MAX_CACHE_SIZE 100
 
 DNSResolver::DNSResolver() :
   _canDeleteContext(true)
